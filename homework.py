@@ -156,8 +156,7 @@ def main():
             else:
                 homework_in_progress = homeworks[0]
                 text = parse_status(homework_in_progress)
-                is_msg_sent = send_message(bot, text)
-                if is_msg_sent:
+                if send_message(bot, text):
                     logger.debug(
                         'Статус для домашнего задания '
                         f'{homework_in_progress["homework_name"]} изменен. '
