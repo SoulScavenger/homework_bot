@@ -75,10 +75,12 @@ def get_api_answer(timestamp):
             ENDPOINT, headers=HEADERS, params={'from_date': timestamp}
         )
         logger.debug(f'Отправка запроса на адрес: {ENDPOINT}')
-    except requests.RequestException:
-        logger.error(f'Ошибка при работе с Эндпоинтом {ENDPOINT}. '
-                     f'Код ошибки: {response.status_code}')
+    except requests.RequestException as error:
+        logger.error(f'Ошибка при работе с Эндпоинтом: {ENDPOINT}. '
+                     f'Ошибка: {error}.')
     if response.status_code != HTTPStatus.OK:
+        logger.error(f'Эндпоинтом: {ENDPOINT} не доступен. '
+                     f'Код ошибки: {response.status_code}.')
         raise requests.RequestException
 
     return response.json()
