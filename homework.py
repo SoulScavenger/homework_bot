@@ -6,7 +6,7 @@ import time
 from http import HTTPStatus
 
 from dotenv import load_dotenv
-from telebot import TeleBot, apihelper
+from telebot import apihelper, TeleBot
 
 from extensions import (
     InvalidTokenError,
