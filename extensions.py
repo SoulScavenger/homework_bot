@@ -15,7 +15,3 @@ class InvalidHomeWorkStatus(Exception):
 
 class InvalidHomeWorkName(Exception):
     """Кастомное исключения для имени ДЗ."""
-
-
-class NoAccessToEndPoint(Exception):
-    """Кастомное исключения для API-запроса."""

@@ -13,7 +13,6 @@ from extensions import (
     InvalidHomeWorkName,
     InvalidHomeWorkStatus,
     SendMessageError,
-    NoAccessToEndPoint
 )
 
 load_dotenv()
@@ -76,13 +75,11 @@ def get_api_answer(timestamp):
             ENDPOINT, headers=HEADERS, params={'from_date': timestamp}
         )
         logger.debug(f'Отправка запроса на адрес: {ENDPOINT}')
-        if response.status_code != HTTPStatus.OK:
-            raise NoAccessToEndPoint(logger.error(
-                f'Эндпоинт: {ENDPOINT} недоступен. '
-                f'Статус: {response.status_code}...'))
-        return response.json()
     except requests.RequestException:
-        logger.error(f'Ошибка при работе с Эндпоинтом {ENDPOINT}')
+        logger.error(f'Ошибка при работе с Эндпоинтом {ENDPOINT}. '
+                     f'Код ошибки: {response.status_code}')
+    if response.status_code != HTTPStatus.OK:
+        raise requests.RequestException
 
     return response.json()
 
