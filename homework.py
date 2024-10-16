@@ -8,7 +8,6 @@ from http import HTTPStatus
 from dotenv import load_dotenv
 from telebot import TeleBot, apihelper
 
-
 from extensions import (
     InvalidTokenError,
     InvalidHomeWorkName,
@@ -32,7 +31,6 @@ handler.setLevel(logging.DEBUG)
 logger.addHandler(handler)
 logger.setLevel(logging.DEBUG)
 
-
 PRACTICUM_TOKEN = os.getenv('PRACTICUM_TOKEN')
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
@@ -46,7 +44,6 @@ DATA_FOR_REQUEST = {
     'header': HEADERS,
     'params': {'from_date': 0}
 }
-
 
 HOMEWORK_VERDICTS = {
     'approved': 'Работа проверена: ревьюеру всё понравилось. Ура!',
