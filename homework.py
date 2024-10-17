@@ -1,10 +1,10 @@
 import os
 import logging
-import requests
 import sys
 import time
 from http import HTTPStatus
 
+import requests
 from dotenv import load_dotenv
 from telebot import apihelper, TeleBot
 
@@ -36,12 +36,11 @@ TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
 RETRY_PERIOD = 600
-PAUSE_BETWEEN_ITERATION = 3
 ENDPOINT = 'https://practicum.yandex.ru/api/user_api/homework_statuses/'
 HEADERS = {'Authorization': f'OAuth {PRACTICUM_TOKEN}'}
 DATA_FOR_REQUEST = {
     'url': ENDPOINT,
-    'header': HEADERS,
+    'headers': HEADERS,
     'params': {'from_date': 0}
 }
 
@@ -77,7 +76,7 @@ def send_message(bot: TeleBot, message: str):
             f'Сообщение в чат: {TELEGRAM_CHAT_ID} успешно отправлено!'
         )
         return True
-    except apihelper.ApiException as error:
+    except (apihelper.ApiException, requests.RequestException) as error:
         logger.error(f'Возникла ошибка при отправки сообщения... {error}')
         return False
 
@@ -89,14 +88,10 @@ def get_api_answer(timestamp):
 
         logger.debug(
             'Отправка запроса на адрес: {url}. '
-            'Заголовок: {header}. '
+            'Заголовок: {headers}. '
             'Параметры: {params} '.format(**DATA_FOR_REQUEST)
         )
-        response = requests.get(
-            url=DATA_FOR_REQUEST['url'],
-            headers=DATA_FOR_REQUEST['header'],
-            params=DATA_FOR_REQUEST['params']
-        )
+        response = requests.get(**DATA_FOR_REQUEST)
 
         logger.debug('Ответ от: {url} получен.'.format(**DATA_FOR_REQUEST))
 
@@ -114,12 +109,17 @@ def get_api_answer(timestamp):
 def check_response(response: dict):
     """Проверка структуры API-ответа."""
     if not isinstance(response, dict):
-        raise TypeError('Ошибка в структуре API-ответа.')
+        raise TypeError(
+            'Ошибка в структуре API-ответа. '
+            f'API-ответ должен иметь тип "dict", а не: "{type(response)}".')
     if 'homeworks' not in response:
         raise KeyError('Отсутствует ключ homeworks в API-ответе.')
     result = response['homeworks']
     if not isinstance(result, list):
-        raise TypeError('Ошибка в структуре homeworks в API-ответа.')
+        raise TypeError(
+            'Ошибка в структуре homeworks API-ответа.'
+            f'homeworks должен иметь тип "list", а не: "{type(result)}".'
+        )
 
     return result
 
@@ -162,9 +162,7 @@ def main():
                         f'{homework_in_progress["homework_name"]} изменен. '
                         f'Статус: {homework_in_progress["status"]}.'
                     )
-                    new_timestamp = response.get('current_date')
-                    if new_timestamp:
-                        timestamp = new_timestamp
+                    timestamp = response.get('current_date', timestamp)
         except Exception as error:
             message = f'Сбой в работе программы: {error}'
             logger.error(message)
